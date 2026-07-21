@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekap Penjualan</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #2c3e50;
+      font-size: 1.8em;
+      font-weight: 700;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .setting-btn {
+      background: #34495e;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      width: auto !important;
+    }
+
+    .stok-section {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+    }
+
+    .stok-section label {
+      color: white;
+      font-weight: 600;
+      font-size: 1em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 320px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th:first-child, td:first-child { min-width: 100px; max-width: 120px; }
+    th:not(:first-child):not(:nth-last-child(2)):not(:last-child), 
+    td:not(:first-child):not(:nth-last-child(2)):not(:last-child) { min-width: 70px; max-width: 90px; }
+    th:nth-last-child(2), td:nth-last-child(2) { min-width: 80px; max-width: 100px; }
+    th:last-child, td:last-child { min-width: 50px; max-width: 60px; }
+
+    th {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      color: #2c3e50;
+      font-weight: 700;
+      padding: 8px 4px;
+      text-align: center;
+      border: none;
+      font-size: 0.8em;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 6px 3px;
+      text-align: center;
+      border: 1px solid #e8f4f8;
+      background: white;
+      transition: background-color 0.3s ease;
+    }
+
+    tr:hover td { background: #f8fcff; }
+
+    input[type=number], input[type=text] {
+      width: 100%;
+      min-width: 50px;
+      padding: 6px 3px;
+      border: 2px solid #e1e8ed;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 12px;
+      background: white;
+    }
+
+    td:first-child input[type=text] { min-width: 80px; font-size: 11px; }
+    input[type=number]:focus, input[type=text]:focus { outline: none; border-color: #667eea; }
+    th input[type=number] { margin-top: 3px; font-size: 10px; padding: 3px; min-width: 40px; }
+
+    #stok-awal {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .total-row td {
+      font-weight: 700;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #2c3e50;
+      font-size: 0.9em;
+      padding: 12px 6px;
+    }
+
+    .total-seller {
+      font-weight: 700;
+      color: #27ae60;
+      font-size: 0.9em;
+      background: #e8f8f5 !important;
+      min-width: 90px;
+    }
+
+    .whatsapp-btn {
+      background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-direction: column;
+    }
+
+    button {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .btn-add { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-wa { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+    .btn-sheets { background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); color: white; margin-top: 10px; }
+
+    button:hover { transform: translateY(-2px); }
+
+    #detail-produk {
+      white-space: pre-line;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #2c3e50;
+    }
+
+    .add-product-btn {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      color: #2c3e50;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* Modal Styling for Setting Menu */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1000; 
+      left: 0; top: 0; 
+      width: 100%; height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h3 { margin-bottom: 15px; color: #2c3e50; }
+    .modal-content label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-top: 10px; text-align: left;}
+    .modal-content input { width: 100%; padding: 8px; margin-top: 5px; text-align: left; }
+    .modal-footer { margin-top: 20px; display: flex; gap: 10px; }
+
+    @media (min-width: 768px) {
+      .button-container { flex-direction: row; }
+      button { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <h2>📊 Rekap Penjualan - <span id="tanggal"></span></h2>
+      <button class="setting-btn" onclick="openSettingModal()">⚙️ Setting</button>
+    </div>
+
+    <div class="stok-section">
+      <label>📦 Stok Awal:</label>
+      <input type="number" id="stok-awal" value="" placeholder="Masukkan jumlah stok awal" onchange="hitungTotal()">
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2">SELLER</th>
+            <th colspan="1">PRODUK</th>
+            <th rowspan="2">TOTAL</th>
+            <th rowspan="2">WA</th>
+          </tr>
+          <tr>
+            <th>JUMBO<br><input type="number" id="harga-JUMBO" placeholder="" onblur="scaleHarga(this)"></th>
+          </tr>
+        </thead>
+        <tbody id="data-penjualan">
+          <tr>
+            <td><input type="text" placeholder="Nama Seller"></td>
+            <td><input type="number" placeholder="0"></td>
+            <td class="total-seller">Rp 0</td>
+            <td><button class="whatsapp-btn" onclick="kirimWhatsappIndividual(this)">WA</button></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2">Total Semua</td>
+            <td id="grand-total">Rp 0</td>
+            <td></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="2">Sisa Stok</td>
+            <td id="sisa-stok">0</td>
+            <td></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="2">Total Terjual</td>
+            <td id="total-terjual">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="button-container">
+      <button class="btn-add" onclick="tambahBaris()">➕ Tambah Seller</button>
+      <button class="btn-wa" onclick="kirimWhatsapp()">📱 Kirim Rekap Lengkap</button>
+    </div>
+
+    <button class="add-product-btn" onclick="tambahProduk()">📦 Tambah Produk</button>
+    <button class="btn-sheets" onclick="kirimKeSpreadsheet()">🟢 Simpan ke Google Spreadsheet</button>
+
+    <div id="detail-produk"></div>
+  </div>
+
+  <!-- Modal Menu Setting -->
+  <div id="settingModal" class="modal">
+    <div class="modal-content">
+      <h3>⚙️ Pengaturan Data</h3>
+      
+      <label>Informasi Pembayaran (Bank/E-Wallet):</label>
+      <input type="text" id="cfg-seabank" placeholder="SEABANK: 901516847602">
+      <input type="text" id="cfg-dana" placeholder="DANA: 082236625627">
+      
+      <label>Atas Nama (A.N):</label>
+      <input type="text" id="cfg-an" placeholder="AHMAD KHAIRUDIN">
+      
+      <label>Link QRIS:</label>
+      <input type="text" id="cfg-qris" placeholder="rebrand.ly/QRIS-HR">
+
+      <div class="modal-footer">
+        <button style="background: #27ae60; color: white;" onclick="saveSettings()">Simpan</button>
+        <button style="background: #e74c3c; color: white;" onclick="closeSettingModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("tanggal").textContent = new Date().toLocaleDateString("id-ID");
+
+    let produkDinamis = [];
+    let produkCounter = 1;
+
+    // Default Configuration
+    let config = {
+      // ⚠️ UBAH LINK SPREADSHEET PERMANEN ANDA DI BAWAH INI:
+      scriptUrl: 'MASUKAN_LINK_KAMU_DISINI', 
+      
+      seabank: localStorage.getItem('cfg_seabank') || 'SEABANK: 901516847602',
+      dana: localStorage.getItem('cfg_dana') || 'DANA: 082236625627',
+      an: localStorage.getItem('cfg_an') || 'AHMAD KHAIRUDIN',
+      qris: localStorage.getItem('cfg_qris') || 'rebrand.ly/QRIS-HR'
+    };
+
+    // Fungsi Pengaturan (Modal)
+    function openSettingModal() {
+      document.getElementById('cfg-seabank').value = config.seabank;
+      document.getElementById('cfg-dana').value = config.dana;
+      document.getElementById('cfg-an').value = config.an;
+      document.getElementById('cfg-qris').value = config.qris;
+      document.getElementById('settingModal').style.display = 'block';
+    }
+
+    function closeSettingModal() {
+      document.getElementById('settingModal').style.display = 'none';
+    }
+
+    function saveSettings() {
+      config.seabank = document.getElementById('cfg-seabank').value.trim();
+      config.dana = document.getElementById('cfg-dana').value.trim();
+      config.an = document.getElementById('cfg-an').value.trim();
+      config.qris = document.getElementById('cfg-qris').value.trim();
+
+      localStorage.setItem('cfg_seabank', config.seabank);
+      localStorage.setItem('cfg_dana', config.dana);
+      localStorage.setItem('cfg_an', config.an);
+      localStorage.setItem('cfg_qris', config.qris);
+
+      alert('Pengaturan berhasil disimpan!');
+      closeSettingModal();
+    }
+
+    function scaleHarga(input) {
+      hitungTotal();
+    }
+
+    function hitungTotal() {
+      const rows = document.querySelectorAll('#data-penjualan tr');
+      let grandTotal = 0;
+      let totalProduk = 0;
+      
+      const produkTerjual = { 'JUMBO': 0 };
+
+      produkDinamis.forEach(produk => {
+        produkTerjual[produk.nama] = 0;
+      });
+
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input[type=number]');
+        const sellerTotalCell = row.querySelector('.total-seller');
+        let total = 0;
+        const harga = {
+          'JUMBO': (parseInt(document.getElementById('harga-JUMBO').value) || 0) * 1000
+        };
+
+        produkDinamis.forEach(produk => {
+          const hargaInput = document.getElementById(`harga-${produk.id}`);
+          harga[produk.nama] = hargaInput ? (parseInt(hargaInput.value) || 0) * 1000 : produk.harga;
+        });
+
+        const qtyJumbo = parseInt(inputs[0].value) || 0;
+        produkTerjual['JUMBO'] += qtyJumbo;
+        total += qtyJumbo * harga['JUMBO'];
+
+        produkDinamis.forEach((produk, i) => {
+          const inputIndex = 1 + i;
+          if (inputs[inputIndex]) {
+            const qty = parseInt(inputs[inputIndex].value) || 0;
+            produkTerjual[produk.nama] += qty;
+            total += qty * harga[produk.nama];
+          }
+        });
+
+        totalProduk += Array.from(inputs).reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+        sellerTotalCell.textContent = 'Rp ' + total.toLocaleString('id-ID');
+        grandTotal += total;
+      });
+
+      document.getElementById('grand-total').textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+      const stokAwal = parseInt(document.getElementById('stok-awal').value) || 0;
+      document.getElementById('sisa-stok').textContent = stokAwal - totalProduk;
+      document.getElementById('total-terjual').textContent = totalProduk;
+
+      let detail = '📋 *Detail Produk Terjual:*\n\n';
+      
+      if (produkTerjual['JUMBO'] > 0) {
+        detail += `• JUMBO: ${produkTerjual['JUMBO']} unit\n`;
+      }
+
+      produkDinamis.forEach(produk => {
+        if (produkTerjual[produk.nama] > 0) {
+          detail += `• ${produk.nama}: ${produkTerjual[produk.nama]} unit\n`;
+        }
+      });
+
+      if (detail === '📋 *Detail Produk Terjual:*\n\n') {
+        detail += 'Belum ada produk yang terjual.';
+      }
+      document.getElementById('detail-produk').textContent = detail;
+    }
+
+    function tambahBaris() {
+      const tbody = document.getElementById('data-penjualan');
+      const row = document.createElement('tr');
+      
+      let rowHTML = `
+        <td><input type="text" placeholder="Nama Seller"></td>
+        <td><input type="number" placeholder="0"></td>
+      `;
+      
+      produkDinamis.forEach(produk => {
+        rowHTML += `<td data-produk="${produk.id}"><input type="number" placeholder="0"></td>`;
+      });
+      
+      rowHTML += `
+        <td class="total-seller">Rp 0</td>
+        <td><button class="whatsapp-btn" onclick="kirimWhatsappIndividual(this)">WA</button></td>
+      `;
+      
+      row.innerHTML = rowHTML;
+      tbody.appendChild(row);
+      
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', hitungTotal);
+      });
+    }
+
+    function updateTabelHeader() {
+      const headerRow = document.querySelector('thead tr:nth-child(1)');
+      const produkHeaderRow = document.querySelector('thead tr:nth-child(2)');
+      
+      const produkHeader = headerRow.querySelector('th:nth-child(2)');
+      const totalKolom = 1 + produkDinamis.length;
+      produkHeader.setAttribute('colspan', totalKolom);
+      
+      produkDinamis.forEach(produk => {
+        const existingHeader = document.getElementById(`header-${produk.id}`);
+        if (!existingHeader) {
+          const newHeader = document.createElement('th');
+          newHeader.id = `header-${produk.id}`;
+          newHeader.innerHTML = `${produk.nama}<br><input type="number" id="harga-${produk.id}" placeholder="" value="${produk.harga/1000}" onblur="scaleHarga(this)">`;
+          produkHeaderRow.appendChild(newHeader);
+        }
+      });
+    }
+
+    function updateSemuaBaris() {
+      const rows = document.querySelectorAll('#data-penjualan tr');
+      rows.forEach(row => {
+        produkDinamis.forEach(produk => {
+          const existingCell = row.querySelector(`[data-produk="${produk.id}"]`);
+          if (!existingCell) {
+            const newCell = document.createElement('td');
+            newCell.setAttribute('data-produk', produk.id);
+            newCell.innerHTML = '<input type="number" placeholder="0">';
+            
+            const cells = row.querySelectorAll('td');
+            const totalCellIndex = Array.from(cells).findIndex(cell => cell.classList.contains('total-seller'));
+            
+            if (totalCellIndex > 0) {
+              row.insertBefore(newCell, cells[totalCellIndex]);
+            }
+            newCell.querySelector('input').addEventListener('input', hitungTotal);
+          }
+        });
+      });
+    }
+
+    function updateFooter() {
+      const footerRows = document.querySelectorAll('tfoot tr');
+      footerRows.forEach(row => {
+        const firstCell = row.querySelector('td:first-child');
+        firstCell.setAttribute('colspan', 1 + produkDinamis.length);
+      });
+    }
+
+    function tambahProduk() {
+      const namaProduk = prompt('Masukkan nama produk baru (contoh: XL, XXL, SPECIAL):');
+      if (!namaProduk || namaProduk.trim() === '') return;
+      
+      const hargaProduk = prompt('Masukkan harga produk (dalam ribuan, contoh: 50 untuk Rp 50.000):');
+      if (!hargaProduk || isNaN(hargaProduk)) {
+        alert('Harga harus berupa angka!');
+        return;
+      }
+      
+      const produkId = `PRODUK${produkCounter}`;
+      produkDinamis.push({
+        id: produkId,
+        nama: namaProduk.trim().toUpperCase(),
+        harga: parseInt(hargaProduk) * 1000
+      });
+      produkCounter++;
+      
+      updateTabelHeader();
+      updateSemuaBaris();
+      updateFooter();
+      hitungTotal();
+    }
+
+    function kirimWhatsappIndividual(button) {
+      const row = button.closest('tr');
+      const cells = row.querySelectorAll('input');
+      const nama = cells[0].value || 'Seller';
+      
+      const harga = {
+        'JUMBO': (parseInt(document.getElementById('harga-JUMBO').value) || 0) * 1000
+      };
+
+      produkDinamis.forEach(produk => {
+        const hargaInput = document.getElementById(`harga-${produk.id}`);
+        harga[produk.nama] = hargaInput ? (parseInt(hargaInput.value) || 0) * 1000 : produk.harga;
+      });
+      
+      const inputs = row.querySelectorAll('input[type=number]');
+      let totalPenjualan = 0;
+      let totalTransaksi = 0;
+      let detailProduk = '';
+      
+      const qtyJumbo = parseInt(inputs[0].value) || 0;
+      if (qtyJumbo > 0) {
+        const subtotal = qtyJumbo * harga['JUMBO'];
+        detailProduk += `• JUMBO: ${qtyJumbo} x Rp ${harga['JUMBO'].toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+        totalPenjualan += subtotal;
+        totalTransaksi += qtyJumbo;
+      }
+
+      produkDinamis.forEach((produk, i) => {
+        const inputIndex = 1 + i;
+        if (inputs[inputIndex]) {
+          const qty = parseInt(inputs[inputIndex].value) || 0;
+          if (qty > 0) {
+            const subtotal = qty * harga[produk.nama];
+            detailProduk += `• ${produk.nama}: ${qty} x Rp ${harga[produk.nama].toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+            totalPenjualan += subtotal;
+            totalTransaksi += qty;
+          }
+        }
+      });
+
+      const today = new Date();
+      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const tanggalFormat = `${hari[today.getDay()]}, ${today.getDate()} ${bulan[today.getMonth()]} ${today.getFullYear()}`;
+      
+      let pesan = `📆 Tanggal: ${tanggalFormat}\n`;
+      pesan += `📦 REKAP PENJUALAN\n`;
+      pesan += `👤 SELLER : ${nama}\n`;
+      pesan += detailProduk ? detailProduk : `• Belum ada penjualan\n`;
+      
+      pesan += `\n💰 TOTAL PENJUALAN: Rp ${totalPenjualan.toLocaleString('id-ID')}\n`;
+      pesan += `💰 TOTAL KESELURUHAN: Rp ${totalPenjualan.toLocaleString('id-ID')}\n`;
+      pesan += `🧾 Total Transaksi: ${totalTransaksi}\n\n`;
+      
+      pesan += `💳 INFORMASI PEMBAYARAN:\n`;
+      if (config.seabank) pesan += `- ${config.seabank}\n`;
+      if (config.dana) pesan += `- ${config.dana}\n`;
+      if (config.an) pesan += `- A.N: ${config.an}\n`;
+      if (config.qris) pesan += `- QRIS: ${config.qris}\n\n`;
+      
+      pesan += `Terima kasih atas kontribusi Anda! 🙏`;
+
+      const url = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+      window.open(url, '_blank');
+    }
+
+    function kirimWhatsapp() {
+      const rows = document.querySelectorAll('#data-penjualan tr');
+      const tanggal = document.getElementById('tanggal').textContent;
+      let pesan = `📊 *Rekap Penjualan - ${tanggal}*\n\n`;
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('input');
+        const nama = cells[0].value || '-';
+        const total = row.querySelector('.total-seller').textContent || 'Rp 0';
+        
+        const slotData = [];
+        const inputs = row.querySelectorAll('input[type=number]');
+        
+        const qtyJumbo = parseInt(inputs[0].value) || 0;
+        if (qtyJumbo > 0) slotData.push(`JUMBO: ${qtyJumbo}`);
+
+        produkDinamis.forEach((produk, i) => {
+          const inputIndex = 1 + i;
+          if (inputs[inputIndex]) {
+            const qty = parseInt(inputs[inputIndex].value) || 0;
+            if (qty > 0) slotData.push(`${produk.nama}: ${qty}`);
+          }
+        });
+
+        pesan += `👤 *${nama}*: ${total}\n`;
+        pesan += slotData.length > 0 ? `   📦 Slot: ${slotData.join(', ')}\n\n` : `   📦 Slot: Tidak ada penjualan\n\n`;
+      });
+
+      const totalSeluruh = document.getElementById('grand-total').textContent;
+      const sisa = document.getElementById('sisa-stok').textContent;
+      const totalTerjual = document.getElementById('total-terjual').textContent;
+      const detailProduk = document.getElementById('detail-produk').textContent;
+
+      pesan += `💰 *Total Semua*: ${totalSeluruh}\n📦 *Total Terjual*: ${totalTerjual} unit\n📋 *Sisa Stok*: ${sisa} unit\n\n${detailProduk}`;
+
+      const url = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+      window.open(url, '_blank');
+    }
+
+    // Fungsi Pengiriman Data ke Spreadsheet
+    function kirimKeSpreadsheet() {
+      if (!config.scriptUrl || config.scriptUrl === 'MASUKAN_LINK_KAMU_DISINI') {
+        alert('URL Google Apps Script belum diatur di dalam kodingan!');
+        return;
+      }
+
+      const rows = document.querySelectorAll('#data-penjualan tr');
+      let dataSellers = [];
+
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input[type=number]');
+        const namaSeller = row.querySelector('input[type=text]').value || 'Tanpa Nama';
+        const totalHarga = row.querySelector('.total-seller').textContent;
+        let detail = [];
+
+        const qtyJumbo = parseInt(inputs[0].value) || 0;
+        if (qtyJumbo > 0) detail.push(`JUMBO: ${qtyJumbo}`);
+
+        produkDinamis.forEach((produk, i) => {
+          const inputIndex = 1 + i;
+          if (inputs[inputIndex]) {
+            const qty = parseInt(inputs[inputIndex].value) || 0;
+            if (qty > 0) detail.push(`${produk.nama}: ${qty}`);
+          }
+        });
+
+        if (detail.length > 0) {
+          dataSellers.push({
+            nama: namaSeller,
+            detail: detail.join(', '),
+            total: totalHarga
+          });
+        }
+      });
+
+      if (dataSellers.length === 0) {
+        alert('Belum ada data penjualan yang diisi!');
+        return;
+      }
+
+      const payload = {
+        tanggal: document.getElementById('tanggal').textContent,
+        sellers: dataSellers
+      };
+
+      fetch(config.scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        alert('Data berhasil dikirim ke Google Spreadsheet!');
+      }).catch(err => {
+        alert('Terjadi kesalahan saat mengirim data: ' + err);
+      });
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', hitungTotal);
+    });
+
+    hitungTotal();
+  </script>
+</body>
+</html>
